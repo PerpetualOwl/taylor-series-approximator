@@ -168,64 +168,125 @@ def calculate(expression, value):
     #calculate the value of the expression
     output = expression
     while len(output) > 1:
+        print(output)
+        skip = False
         for num in range(len(output)):
+            print("iter " + str(num) + " val= " + str(output[num]))
             if type(output[num]) == list:
                 output[num] = calculate(output[num], value)
+                skip = True
                 break
             elif output[num] == "x":
                 output[num] = value
+                skip = True
                 break
             elif output[num] == "e":
                 output[num] = 2.718281828459045
+                skip = True
                 break
             elif output[num] == "pi":
                 output[num] = 3.141592653589793
+                skip = True
                 break
+        if skip == True:
+            continue
         for num in range(len(output)):
             if output[num] == "sin":
-                output[num + 1] = output[num + 1] ** 0.5
+                output[num + 1] = math.sin(output[num + 1])
                 del output[num]
+                skip = True
                 break
+            elif output[num] == "cos":
+                output[num + 1] = math.cos(output[num + 1])
+                del output[num]
+                skip = True
+                break
+            elif output[num] == "tan":
+                output[num + 1] = math.tan(output[num + 1])
+                del output[num]
+                skip = True
+                break
+            elif output[num] == "sec":
+                output[num + 1] = 1 / math.cos(output[num + 1])
+                del output[num]
+                skip = True
+                break
+            elif output[num] == "csc":
+                output[num + 1] = 1 / math.sin(output[num + 1])
+                del output[num]
+                skip = True
+                break
+            elif output[num] == "cot":
+                output[num + 1] = 1 / math.tan(output[num + 1])
+                del output[num]
+                skip = True
+                break
+        if skip == True:
+            continue
         for num in range(len(output)):
             if output[num] == "^":
                 output[num - 1] = output[num - 1] ** output[num + 1]
                 del output[num]
                 del output[num]
+                skip = True
                 break
             elif output[num] == "sqrt":
                 output[num + 1] = output[num + 1] ** 0.5
                 del output[num]
+                skip = True
                 break
             elif output[num] == "ln":
                 output[num + 1] = math.log(output[num + 1])
                 del output[num]
+                skip = True
                 break
             elif output[num] == "log":
                 output[num + 1] = math.log(output[num + 1], 10)
                 del output[num]
+                skip = True
                 break
+        if skip == True:
+            continue
         for num in range(len(output)):
             if output[num] == "*":
                 output[num - 1] = output[num - 1] * output[num + 1]
                 del output[num]
                 del output[num]
+                skip = True
                 break
             elif output[num] == "/":
                 output[num - 1] = output[num - 1] / output[num + 1]
                 del output[num]
                 del output[num]
+                skip = True
                 break
+            elif isinstance(output[num], (int, float)):
+                try:
+                    if isinstance(output[num + 1], (int, float)):
+                        output[num] = output[num] * output[num + 1]
+                        del output[num + 1]
+                        skip = True
+                        break
+                except:
+                    break
+        if skip == True:
+            continue
+        print("late" + str(output))
         for num in range(len(output)):
             if output[num] == "+":
                 output[num - 1] = output[num - 1] + output[num + 1]
                 del output[num]
                 del output[num]
+                skip = True
                 break
             elif output[num] == "-":
                 output[num - 1] = output[num - 1] - output[num + 1]
                 del output[num]
                 del output[num]
+                skip = True
                 break
+        if skip == True:
+            continue
 
     return output[0]
 
@@ -257,11 +318,12 @@ def main():
     print(expression)
     expression = reformat(expression)
     print(expression)
-    '''
-    a = input("Enter where to center series: ")
-    n = input("Enter number of iterations: ")
-    result = taylor_series(expression, a, n)
-    print(result)'''
+    a = input("Enter value: ")
+    print(calculate(expression, int(a)))
+    #a = input("Enter where to center series: ")
+    #n = input("Enter number of iterations: ")
+    #result = taylor_series(expression, a, n)
+    #print(result)
     return
 
 if __name__ == '__main__':
