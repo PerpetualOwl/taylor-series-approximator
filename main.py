@@ -1,4 +1,6 @@
 
+#don't like external libraries but have to use for large factorials, trig, and log
+import math
 
 def read_input(input):
     input.split()
@@ -40,20 +42,26 @@ def read_input(input):
             output.append(temp)
         elif char.isnumeric():
             n = 1
-            decimal = 1
+            length = 1
+            decimal = 0
             temp = int(input[num])
             while (len(input) > num + n) and (input[num + n].isnumeric() or (input[num + n] == " ") or (input[num + n] == ".") or (input[num + n] == ",")):
                 if (input[num + n] == " ") or (input[num + n] == ","):
                     n = n + 1
                     continue
                 elif input[num + n] == ".":
-                    decimal = n
+                    decimal = length
                     n = n + 1
                     continue
-                temp = temp + (int(input[num + n]) * (10 ** (n)))
-                n = n + 1
+                elif input[num + n].isnumeric():
+                    temp = temp * 10 + int(input[num + n])
+                    n = n + 1
+                    length = length + 1
+                    continue
+            if decimal == 0:
+                decimal = length
             skip = n - 1
-            temp = temp / (10 ** (n - decimal))
+            temp = temp / (10 ** (length - decimal))
             output.append(temp)
         elif char == "s": #sin, sec, sqrt
             if (input[num + 1] == "i") and (input[num + 2] == "n"):
@@ -114,9 +122,112 @@ def read_input(input):
                 exit()
     return output
 
-def calculate(expression, value):
+def reformat(input):
+    #reformat expression to be in a form that can be used by the calculator
+    if input.count(")") != input.count("("):
+        print("Invalid input")
+        exit()
+    output = []
+    skip = 0
+    isdone = False
+    while isdone == False:
+        isdone = True
+        for num in range(len(input)):
+            if input[num] == "(":
+                isdone = False
+                n = 0
+                open_parentheses = 0
+                if skip > 0:
+                    skip = skip - 1
+                    continue
+                while True:
+                    n = n + 1
+                    if num + n == len(input):
+                        print("Invalid input")
+                        exit()
+                    if input[num + n] == "(":
+                        open_parentheses = open_parentheses + 1
+                    if input[num + n] == ")":
+                        if open_parentheses > 0:
+                            open_parentheses = open_parentheses - 1
+                        else:
+                            break
+                temp = []
+                temp.extend(input[0:num])
+                p_block = input[num + 1:num + n]
+                p_block = reformat(p_block)
+                temp.append(p_block)
+                temp.extend(input[num + n + 1:len(input)])
+                input = temp
+                skip = n
+                break
     output = input
     return output
+
+def calculate(expression, value):
+    #calculate the value of the expression
+    output = expression
+    while len(output) > 1:
+        for num in range(len(output)):
+            if type(output[num]) == list:
+                output[num] = calculate(output[num], value)
+                break
+            elif output[num] == "x":
+                output[num] = value
+                break
+            elif output[num] == "e":
+                output[num] = 2.718281828459045
+                break
+            elif output[num] == "pi":
+                output[num] = 3.141592653589793
+                break
+        for num in range(len(output)):
+            if output[num] == "sin":
+                output[num + 1] = output[num + 1] ** 0.5
+                del output[num]
+                break
+        for num in range(len(output)):
+            if output[num] == "^":
+                output[num - 1] = output[num - 1] ** output[num + 1]
+                del output[num]
+                del output[num]
+                break
+            elif output[num] == "sqrt":
+                output[num + 1] = output[num + 1] ** 0.5
+                del output[num]
+                break
+            elif output[num] == "ln":
+                output[num + 1] = math.log(output[num + 1])
+                del output[num]
+                break
+            elif output[num] == "log":
+                output[num + 1] = math.log(output[num + 1], 10)
+                del output[num]
+                break
+        for num in range(len(output)):
+            if output[num] == "*":
+                output[num - 1] = output[num - 1] * output[num + 1]
+                del output[num]
+                del output[num]
+                break
+            elif output[num] == "/":
+                output[num - 1] = output[num - 1] / output[num + 1]
+                del output[num]
+                del output[num]
+                break
+        for num in range(len(output)):
+            if output[num] == "+":
+                output[num - 1] = output[num - 1] + output[num + 1]
+                del output[num]
+                del output[num]
+                break
+            elif output[num] == "-":
+                output[num - 1] = output[num - 1] - output[num + 1]
+                del output[num]
+                del output[num]
+                break
+
+    return output[0]
 
 def derivative(input):
     # calculate derivative of input array
@@ -124,10 +235,8 @@ def derivative(input):
     return output
 
 def factorial(value):
-
     if value > 20:
         # only use this for large numbers for speed since I am trying to avoid using any external libraries
-        import math
         return math.factorial(value)
     output = 1
     while value > 0:
@@ -140,18 +249,15 @@ def taylor_series(input, a, n):
     output = input
     return output
 
-def test_if_valid(input):
-    # test if expression inputted is valid (no extra symbols, etc.)
-    bool = True
-    return bool
-
 def main():
     # read input
     print("Careful about PEMDAS and please avoid confusing variable usage")
     user_input = input("Enter a function using standard math symbols: ")
     expression = read_input(user_input)
     print(expression)
-    '''test_if_valid(expression)
+    expression = reformat(expression)
+    print(expression)
+    '''
     a = input("Enter where to center series: ")
     n = input("Enter number of iterations: ")
     result = taylor_series(expression, a, n)
