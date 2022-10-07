@@ -1,6 +1,12 @@
 
 #don't like external libraries but have to use for large factorials, trig, and log
 import math
+from tkinter import N
+
+def clearvars():
+    for variable in dir():
+        if variable[0:2] != "__":
+            del globals()[variable]
 
 def read_input(input):
     input.split()
@@ -162,143 +168,211 @@ def reformat(input):
                 skip = n
                 break
     output = input
+    isdone = False
+    while isdone == False:
+        isdone = True
+        for num in range(len(output)):
+            if input[num] == "-":
+                input[num] = "+"
+                input.insert(num + 1, -1)
+                isdone = False
+                continue
     return output
 
 def calculate(expression, value):
     #calculate the value of the expression
-    output = expression
-    while len(output) > 1:
-        print(output)
+    out_list = []
+    out_list = expression
+    for num in range(len(out_list)):
+        if out_list[num] == "x":
+            out_list[num] = value
+    while len(out_list) > 1:
         skip = False
-        for num in range(len(output)):
-            print("iter " + str(num) + " val= " + str(output[num]))
-            if type(output[num]) == list:
-                output[num] = calculate(output[num], value)
+        for num in range(len(out_list)):
+            if type(out_list[num]) == list:
+                out_list[num] = calculate(out_list[num], value)
                 skip = True
                 break
-            elif output[num] == "x":
-                output[num] = value
+            elif out_list[num] == "x":
+                out_list[num] = value
                 skip = True
                 break
-            elif output[num] == "e":
-                output[num] = 2.718281828459045
+            elif out_list[num] == "e":
+                out_list[num] = 2.718281828459045
                 skip = True
                 break
-            elif output[num] == "pi":
-                output[num] = 3.141592653589793
-                skip = True
-                break
-        if skip == True:
-            continue
-        for num in range(len(output)):
-            if output[num] == "sin":
-                output[num + 1] = math.sin(output[num + 1])
-                del output[num]
-                skip = True
-                break
-            elif output[num] == "cos":
-                output[num + 1] = math.cos(output[num + 1])
-                del output[num]
-                skip = True
-                break
-            elif output[num] == "tan":
-                output[num + 1] = math.tan(output[num + 1])
-                del output[num]
-                skip = True
-                break
-            elif output[num] == "sec":
-                output[num + 1] = 1 / math.cos(output[num + 1])
-                del output[num]
-                skip = True
-                break
-            elif output[num] == "csc":
-                output[num + 1] = 1 / math.sin(output[num + 1])
-                del output[num]
-                skip = True
-                break
-            elif output[num] == "cot":
-                output[num + 1] = 1 / math.tan(output[num + 1])
-                del output[num]
+            elif out_list[num] == "pi":
+                out_list[num] = 3.141592653589793
                 skip = True
                 break
         if skip == True:
             continue
-        for num in range(len(output)):
-            if output[num] == "^":
-                output[num - 1] = output[num - 1] ** output[num + 1]
-                del output[num]
-                del output[num]
+        for num in range(len(out_list)):
+            if out_list[num] == "sin":
+                out_list[num + 1] = math.sin(out_list[num + 1])
+                del out_list[num]
                 skip = True
                 break
-            elif output[num] == "sqrt":
-                output[num + 1] = output[num + 1] ** 0.5
-                del output[num]
+            elif out_list[num] == "cos":
+                out_list[num + 1] = math.cos(out_list[num + 1])
+                del out_list[num]
                 skip = True
                 break
-            elif output[num] == "ln":
-                output[num + 1] = math.log(output[num + 1])
-                del output[num]
+            elif out_list[num] == "tan":
+                out_list[num + 1] = math.tan(out_list[num + 1])
+                del out_list[num]
                 skip = True
                 break
-            elif output[num] == "log":
-                output[num + 1] = math.log(output[num + 1], 10)
-                del output[num]
+            elif out_list[num] == "sec":
+                out_list[num + 1] = 1 / math.cos(out_list[num + 1])
+                del out_list[num]
+                skip = True
+                break
+            elif out_list[num] == "csc":
+                out_list[num + 1] = 1 / math.sin(out_list[num + 1])
+                del out_list[num]
+                skip = True
+                break
+            elif out_list[num] == "cot":
+                out_list[num + 1] = 1 / math.tan(out_list[num + 1])
+                del out_list[num]
                 skip = True
                 break
         if skip == True:
             continue
-        for num in range(len(output)):
-            if output[num] == "*":
-                output[num - 1] = output[num - 1] * output[num + 1]
-                del output[num]
-                del output[num]
+        for num in range(len(out_list)):
+            if out_list[num] == "^":
+                out_list[num - 1] = out_list[num - 1] ** out_list[num + 1]
+                del out_list[num]
+                del out_list[num]
                 skip = True
                 break
-            elif output[num] == "/":
-                output[num - 1] = output[num - 1] / output[num + 1]
-                del output[num]
-                del output[num]
+            elif out_list[num] == "sqrt":
+                out_list[num + 1] = out_list[num + 1] ** 0.5
+                del out_list[num]
                 skip = True
                 break
-            elif isinstance(output[num], (int, float)):
+            elif out_list[num] == "ln":
+                out_list[num + 1] = math.log(out_list[num + 1])
+                del out_list[num]
+                skip = True
+                break
+            elif out_list[num] == "log":
+                out_list[num + 1] = math.log(out_list[num + 1], 10)
+                del out_list[num]
+                skip = True
+                break
+        if skip == True:
+            continue
+        for num in range(len(out_list)):
+            if out_list[num] == "*":
+                out_list[num - 1] = out_list[num - 1] * out_list[num + 1]
+                del out_list[num]
+                del out_list[num]
+                skip = True
+                break
+            elif out_list[num] == "/":
+                out_list[num - 1] = out_list[num - 1] / out_list[num + 1]
+                del out_list[num]
+                del out_list[num]
+                skip = True
+                break
+            elif isinstance(out_list[num], (int, float)):
                 try:
-                    if isinstance(output[num + 1], (int, float)):
-                        output[num] = output[num] * output[num + 1]
-                        del output[num + 1]
+                    if isinstance(out_list[num + 1], (int, float)):
+                        out_list[num] = out_list[num] * out_list[num + 1]
+                        del out_list[num + 1]
                         skip = True
                         break
                 except:
                     break
         if skip == True:
             continue
-        print("late" + str(output))
-        for num in range(len(output)):
-            if output[num] == "+":
-                output[num - 1] = output[num - 1] + output[num + 1]
-                del output[num]
-                del output[num]
+        for num in range(len(out_list)):
+            if out_list[num] == "+":
+                out_list[num - 1] = out_list[num - 1] + out_list[num + 1]
+                del out_list[num]
+                del out_list[num]
                 skip = True
                 break
-            elif output[num] == "-":
-                output[num - 1] = output[num - 1] - output[num + 1]
-                del output[num]
-                del output[num]
+            elif out_list[num] == "-":
+                out_list[num - 1] = out_list[num - 1] - out_list[num + 1]
+                del out_list[num]
+                del out_list[num]
                 skip = True
                 break
         if skip == True:
             continue
-
-    return output[0]
+    if len(out_list) == 1:
+        return out_list[0]
+    else:
+        print("Invalid input")
+        exit()
 
 def derivative(input):
     # calculate derivative of input array
+    list_of_additions = []
+    for i in range(len(input)):
+        if input[i] == "+":
+            list_of_additions.append[i]
+    if len(list_of_additions) > 0: 
+        prev = 0
+        for j in list_of_additions:
+            temp = derivative(input[prev:j])
+            del input[prev:j]
+            input.insert(prev, temp)
+            prev = j + 1
     output = input
     return output
 
+def derivative_at_value(input, value):
+    # calculate derivative of input array at value
+    value = float(value)
+    h = 1
+    amount = 0
+    prev = 123456789
+    while amount < 7:
+        input1 = input.copy()
+        input2 = input.copy()
+        j = (calculate(input1, value + h) - calculate(input2, value)) / h
+        if prev - j < .0001:
+            amount = amount + 1
+        else:
+            amount = 0
+        prev = j
+        h = h / 10
+    return round(j, 5)
+
+def nth_derivative_at_value(input, value, n):
+    # calculate nth derivative of input array at a specific value
+    value = float(value)
+    n = int(n)
+    dx = 1
+    amount = 0
+    prev = 123456789
+    while amount < 7:
+        total = 0
+        for k in range(n + 1):
+            temp = (-1) ** k
+            temp = temp * factorial(n) / factorial(k) / factorial(n - k)
+            input1 = input.copy()
+            temp = temp * calculate(input1, (value + dx * (n - k)))
+            temp = temp / (dx ** n)
+            total = total + temp
+        print(prev-total)
+        if prev - total < .0001:
+            amount = amount + 1
+        else:
+            amount = 0
+        prev = total
+        dx = dx / 10
+    return round(total, 5)
+
 def factorial(value):
-    if value > 20:
+    if value > 100:
         # only use this for large numbers for speed since I am trying to avoid using any external libraries
-        return math.factorial(value)
+        # however, math.factorial is fast since it is a C implementation
+        return math.factorial(int(value))
     output = 1
     while value > 0:
         output = output * value
@@ -310,18 +384,24 @@ def taylor_series(input, a, n):
     output = input
     return output
 
+def x(input):
+    output = input
+    return output
+
 def main():
     # read input
     print("Careful about PEMDAS and please avoid confusing variable usage")
     user_input = input("Enter a function using standard math symbols: ")
-    expression = read_input(user_input)
-    print(expression)
-    expression = reformat(expression)
-    print(expression)
+    exp = read_input(user_input)
+    exp = reformat(exp)
     a = input("Enter value: ")
-    print(calculate(expression, int(a)))
-    #a = input("Enter where to center series: ")
-    #n = input("Enter number of iterations: ")
+    dvin = exp.copy()
+    print(nth_derivative_at_value(dvin, a, 5))
+    dvin2 = exp.copy()
+    print(nth_derivative_at_value(dvin2, a, 30))
+    
+    #a = int(input("Enter where to center series: "))
+    #n = int(input("Enter number of iterations: "))
     #result = taylor_series(expression, a, n)
     #print(result)
     return
